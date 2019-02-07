@@ -1,0 +1,14 @@
+# Instalando o virtualenv
+-> pip3 install virtualenv
+
+# Criando a virtualenv
+-> virtualenv .venv
+
+# Ativando a virtualenv
+-> source .venv/bin/activate
+
+# Instalando o flask dentro da virtualenv
+-> pip3 install flask
+
+# Iniciando a aplicação
+-> python3 app.py
