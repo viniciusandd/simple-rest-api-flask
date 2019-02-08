@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -15,8 +15,9 @@ class Produto(db.Model):
 def inicio():
     return "<h3> Servidor iniciado com sucesso! </h3>"
 
-@app.route('/produtos', methods=['GET'])
-def get_produtos():
+# Retorna todos os produtos
+@app.route('/produto', methods=['GET'])
+def get_produto():
     produtos = Produto.query.all()
 
     retorno = []
@@ -30,8 +31,9 @@ def get_produtos():
 
     return jsonify({'retorno':retorno})
 
-@app.route('/produtos/ID=<int:id>', methods=['GET'])
-def get_produtos_por_id(id):
+# Retorna os produtos pelo ID
+@app.route('/produto/<int:id>', methods=['GET'])
+def get_produto_por_id(id):
     produto = Produto.query.filter_by(id=id).first()
 
     if not produto:
@@ -43,6 +45,48 @@ def get_produtos_por_id(id):
     dados['valor']     = produto.valor    
 
     return jsonify({'produtos':dados})    
+
+# Inserindo um novo produto
+@app.route('/produto', methods=['POST'])
+def post_produto():    
+    dados = request.get_json()
+
+    novo_produto = Produto(id=dados['id'], descricao=dados['descricao'], valor=dados['valor'])
+    db.session.add(novo_produto)
+    db.session.commit()
+
+    return jsonify({'retorno':'Produto inserido.'})
+
+# Editando um produto
+@app.route('/produto/<int:id>', methods=['PUT'])
+def put_produto(id):            
+    produto = Produto.query.filter_by(id=id).first()
+
+    if not produto:
+        return jsonify({'retorno':'Nenhum produto foi encontrado'})
+
+    dados = request.get_json()        
+
+    produto.id        = dados['id']
+    produto.descricao = dados['descricao']
+    produto.valor     = dados['valor']
+
+    db.session.commit()
+
+    return jsonify({'retorno':'Produto alterado.'})
+
+# Deletando um produto
+@app.route('/produto/<int:id>', methods=['DELETE'])
+def delete_produto(id):      
+    produto = Produto.query.filter_by(id=id).first()
+
+    if not produto:
+        return jsonify({'retorno':'Nenhum produto foi encontrado'})
+
+    db.session.delete(produto)
+    db.session.commit()
+
+    return jsonify({'retorno':'Produto deletado.'})
 
 if __name__ == "__main__":
     app.run(debug=True)
