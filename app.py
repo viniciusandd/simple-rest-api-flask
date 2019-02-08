@@ -28,7 +28,21 @@ def get_produtos():
         dados['valor']     = produto.valor
         retorno.append(dados)
 
-    return jsonify({'produtos':retorno})
+    return jsonify({'retorno':retorno})
+
+@app.route('/produtos/ID=<int:id>', methods=['GET'])
+def get_produtos_por_id(id):
+    produto = Produto.query.filter_by(id=id).first()
+
+    if not produto:
+        return jsonify({'retorno':'Nenhum produto foi encontrado'})
+        
+    dados = {}
+    dados['id']        = produto.id
+    dados['descricao'] = produto.descricao
+    dados['valor']     = produto.valor    
+
+    return jsonify({'produtos':dados})    
 
 if __name__ == "__main__":
     app.run(debug=True)
