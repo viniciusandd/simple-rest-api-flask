@@ -1,35 +1,34 @@
 from flask import Flask, jsonify
-import psycopg2
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123@localhost/local'
+db = SQLAlchemy(app)
+
+class Produto(db.Model):
+    id        = db.Column(db.Integer, primary_key=True)
+    descricao = db.Column(db.String(50))
+    valor     = db.Column(db.Float)
 
 # Raiz da URL
 @app.route("/", methods=['GET'])
 def inicio():
-    return "Servidor iniciado com sucesso."
+    return "<h3> Servidor iniciado com sucesso! </h3>"
 
-produtos = [
-    {
-        'codigo': '01',
-        'descricao': 'Mouse'
-    },
-    {
-        'codigo': '02',
-        'descricao': 'Monitor'
-    },
-    {
-        'codigo': '03',
-        'descricao': 'Notebook'
-    } ,
-    {
-        'codigo': '04',
-        'descricao': 'Cooler'
-    }             
-]
-
-@app.route("/produtos", methods=['GET'])
+@app.route('/produtos', methods=['GET'])
 def get_produtos():
-    return jsonify(produtos)
+    produtos = Produto.query.all()
+
+    retorno = []
+
+    for produto in produtos:
+        dados = {}
+        dados['id']        = produto.id
+        dados['descricao'] = produto.descricao
+        dados['valor']     = produto.valor
+        retorno.append(dados)
+
+    return jsonify({'produtos':retorno})
 
 if __name__ == "__main__":
     app.run(debug=True)
