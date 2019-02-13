@@ -88,5 +88,8 @@ def delete_produto(id):
 
     return jsonify({'retorno':'Produto deletado.'})
 
+# app.run(debug=True) deixa a Api em ambiente de sandbox, somente o localhost tem acesso
+# app.run(host='0.0.0.0') Deixa a APi aberta, outros hosts conseguem acessa-la.
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
